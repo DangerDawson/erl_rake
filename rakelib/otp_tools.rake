@@ -95,6 +95,7 @@ namespace :otp do
   task :new_application, :name do |t, args|
     app_name = args.name
     root_directory = "lib/#{app_name}"
+    template_directory = "rakelib/otp_templates"
     app_file_name = app_name + ".app.src"
     rel_file_name = app_name + ".rel.src"
     mkdir root_directory
@@ -145,6 +146,14 @@ namespace :otp do
     end
     File.open(root_directory + "/release_config/sys.config", 'w') do |file| 
       file.write("[].")
+    end
+
+    # Put the skeleton of the OTP application and supervisor files in place
+    FileList.new( template_directory + "/generic_*.erl" ).each do |template|
+      filename = File.basename( template.gsub(/generic/, app_name).to_s )
+      File.open(root_directory + "/src/" + filename ,'w') do |output_file|
+        output_file.puts File.read(template).gsub(/%% APPLICATION %%/, app_name)
+      end
     end
 
   end
