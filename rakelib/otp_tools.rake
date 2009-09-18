@@ -83,7 +83,8 @@ namespace :otp do
           else
             "\" \""
           end
-    rel = ERL_RELEASE_FILES.find("#{args.name}-*.rel").first
+    rel = ERL_RELEASE_FILES.include("#{args.name}-*.rel").first
+    puts rel
     
     boot = rel.ext("").pathmap("release_local/%f")
     conf = rel.pathmap("%d/../release_config/sys")
@@ -92,24 +93,28 @@ namespace :otp do
 
   desc "Create a new OTP application"
   task :new_application, :name do |t, args|
-    root_directory = "lib/#{args.name}"
-    app_file_name = args.name + ".app.src"
+    app_name = args.name
+    root_directory = "lib/#{app_name}"
+    app_file_name = app_name + ".app.src"
+    rel_file_name = app_name + ".rel.src"
     mkdir root_directory
     mkdir root_directory + "/src"
     mkdir root_directory + "/test"
     mkdir root_directory + "/include"
     mkdir root_directory + "/priv"
     mkdir root_directory + "/doc"
+    mkdir root_directory + "/release_config"
     File.open(root_directory + "/vsn.config", 'w') do |file| 
-      file.write("{vsn,\"0.1\"}.")
+      file.write("{vsn,\"0.1\"}.\n")
+      file.write("{release_name,\"initial\"}.\n")
     end
   
     File.open(root_directory + "/src/" + app_file_name, 'w') do |file|
-      lines = ["{application, " + args.name + ",\n",
+      lines = ["{application, " + app_name + ",\n",
                "[{description, \"\"},\n",
                "{author, \"\"},\n",
                "{vsn, %VSN%},\n",
-               "{modules, %MODULES%},\n",
+               "{modules, [%MODULES%]},\n",
                "{registered, []},\n",
                "{applications, [kernel, stdlib, sasl]}\n",
                "]}."]
@@ -117,6 +122,31 @@ namespace :otp do
         file.write(line)
       end
     end
+
+    File.open(root_directory + "/src/" + rel_file_name, 'w') do |file|
+      lines = ["{release,\n",
+        "{\"#{app_name}\", \"\"},\n",
+        "{erts, \"_\"},\n",
+        "[{kernel, \"_\"},\n",
+        "{stdlib, \"_\"},\n",
+        "{sasl, \"_\"},\n",
+        "{mnesia, \"_\"},\n",
+        "{#{app_name}, \"_\"}]\n",
+        "}.\n" ]
+      lines.each do |line|
+        file.write(line)
+      end
+    end
+
+    # Create some deafult startup scripts
+    File.open(root_directory + "/release_config/startup.conf", 'w') do |file| 
+      file.write("ERL_FLAGS=\"-pa patches +K true -sname #{app_name} -smp auto\"\n")
+      file.write("export ERL_FLAGS\n")
+    end
+    File.open(root_directory + "/release_config/sys.config", 'w') do |file| 
+      file.write("[].")
+    end
+
   end
 
   CLEAN.include('tmp')
@@ -127,7 +157,7 @@ namespace :otp do
     release_name = FileList.new("lib/*/ebin/"+File.join(args.name+'-'+args.version+'.rel'))
     release_archive = File.join('tmp',args.name+'-'+args.version+'.tar.gz')
     
-    if not File.file?(release_name[0])
+    if release_name.empty? or !File.file?(release_name[0])
       puts "The release #{args.name}-#{args.version} doesn't exist"
       exit(-1)
     end

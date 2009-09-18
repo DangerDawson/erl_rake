@@ -27,3 +27,23 @@ rake otp:initial_targer[name,version]: Create a tarball with a 'ready' to deploy
      application sample_rake.
 = Author = 
 Nicolas Charpentier <open_source@charpi.net>
+
+= Quick Start =
+
+Create the a default erlang_config.rb file 
+% rake
+
+Edit the erlang_config.rb and add the path to your erlang installation
+e.g. ERL_TOP="/usr/local/lib/erlang"
+
+Create the framework of an OTP Application
+% rake otp:new_application[simple_app]
+
+Create a relesase
+% rake otp:initial_target[fred,initial]
+
+Start the OTP project
+% rake otp:start_local[fred]
+
+
+
