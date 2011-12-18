@@ -19,7 +19,7 @@ main([Style, Script, Outdir|Paths]) ->
     end;
 main(_) ->
     usage().
-        
+
 usage() ->
     io:format("usage: make_script <local/distrib> <release_name> <path> [<additional_code_path>]\n"),
     halt(1).

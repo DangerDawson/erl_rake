@@ -11,7 +11,7 @@ main([Script, Output | Paths]) ->
     end;
 main(_) ->
     usage().
-        
+
 usage() ->
     io:format("usage: make_release <release_name> [<additional_code_path>]\n"),
     halt(1).

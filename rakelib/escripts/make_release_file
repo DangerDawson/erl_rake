@@ -12,7 +12,7 @@ main([File_in, File_out, VSN | Paths]) ->
 	    exit({E,R,erlang:get_stacktrace()})
     end.
 
-update_release_info({release, 
+update_release_info({release,
 		     {Name, _},
 		     {erts, _},
 		     Applications}, VSN, Erts_version) ->

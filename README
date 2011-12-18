@@ -1,11 +1,11 @@
 Sample erlang application to demonstrate the use of rake tasks dedicated to erlang.
 
-= Installation = 
+= Installation =
 
 Put in your project the directory 'rakelib' it contains all '.rake'
 files and some escript needed by tasks.
 
-= Usage = 
+= Usage =
 rake --tasks : to know all tasks
 
 You'll need a configuration in which you'll have to put things specific to your installation.
@@ -14,7 +14,7 @@ A template of file is generated the first time you launch 'rake'
 Here is some useful tasks:
 rake erlang:modules: Compile all erlang source files (test included)
 rake erlang:releases: Build a tarball for each rel file found in the directory tree
-rake erlang:tests[name]: Run the eunit test for the application "name". If no name is given, 
+rake erlang:tests[name]: Run the eunit test for the application "name". If no name is given,
      all applications are tested. If a file test.desc is find in the "app_name/test" directory, eunit will
      use it as eunit test description.
 rake erlang:edoc[name]: Build the document for an application or all if 'name' is omitted
@@ -25,12 +25,12 @@ rake otp:initial_targer[name,version]: Create a tarball with a 'ready' to deploy
      an erlang system running the release. To use the system, you have to provide
      2 startup files in a directory named 'release_config'. Look at the sample in the
      application sample_rake.
-= Author = 
+= Author =
 Nicolas Charpentier <open_source@charpi.net>
 
 = Quick Start =
 
-Create the a default erlang_config.rb file 
+Create the a default erlang_config.rb file
 % rake
 
 Edit the erlang_config.rb and add the path to your erlang installation

@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%%% @author 
+%%% @author
 %%% @doc
 %%%
 %%% Created :
@@ -34,7 +34,7 @@ start(_Type, _StartArgs) ->
 %% Function: stop(State) -> void()
 %% Description: This function is called whenever an application
 %% has stopped. It is intended to be the opposite of Module:start/2 and
-%% should do any necessary cleaning up. The return value is ignored. 
+%% should do any necessary cleaning up. The return value is ignored.
 %%--------------------------------------------------------------------
 stop(_State) ->
     ok.
