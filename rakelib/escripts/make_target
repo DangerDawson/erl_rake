@@ -14,14 +14,14 @@ main([Script, Temporary_dir, Output, Erts_dir|Paths]) ->
 	Options = [{outdir, Temporary_dir}, {dirs, []}, {path,Paths}, {erts,Erts_dir}],
 	io:fwrite("Bulding release archive~n"),
 	systools:make_tar(Script, Options),
-	
+
 	file:set_cwd(Temporary_dir),
 
 	ok = erl_tar:extract(Archive_name, [compressed]),
-	
+
 	io:fwrite("Creating additional directories~n"),
 	[file:make_dir(Dir) || Dir <- ["bin","config","log","pipes"]],
-	
+
 	io:fwrite("Copying binaries~n"),
 	Names = ["run_erl","to_erl"],
 	[copy_to_bin(Erts_version,Name) || Name <- Names],
@@ -31,17 +31,17 @@ main([Script, Temporary_dir, Output, Erts_dir|Paths]) ->
 
 	io:fwrite("Copying configuration scripts~n"),
 	copy_configuration_scripts(Release_config_dir,"bin", VSN_dir),
-	
+
 	io:fwrite("Creating start_erl.data~n"),
-	file:write_file("releases/start_erl.data", 
+	file:write_file("releases/start_erl.data",
 			io_lib: fwrite("~s ~s",[Erts_version, VSN])),
-			
+
 	io:fwrite("Rebuilding archive file~n"),
 	{ok, Tar} = erl_tar:open(Archive_name,[write,compressed]),
 	Directories = ["bin", "config", "log", "pipes", "releases", "lib",
 		       "erts-"++ Erts_version],
 	[erl_tar:add(Tar, Dir, [verbose]) || Dir <- Directories],
-	
+
 	erl_tar:close(Tar),
 	file:set_cwd(".."),
 	io:fwrite("Copying archive file to ~p~n",[Output]),
@@ -53,7 +53,7 @@ main([Script, Temporary_dir, Output, Erts_dir|Paths]) ->
     end;
 main(_) ->
     usage().
-        
+
 usage() ->
     io:format("usage: make_target <release_name> <erts_dir> [<additional_code_path>]\n"),
     halt(1).

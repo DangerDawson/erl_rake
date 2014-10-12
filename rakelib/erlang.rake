@@ -4,8 +4,8 @@
 # Distributed under BSD licence
 
 
-if File.file?('erlang_config.rb') 
-  require 'erlang_config'  
+if File.file?('erlang_config.rb')
+  require 'erlang_config'
 else
   puts "erlang_config.rb file is missing."
   puts "You need to fill it with your local configuration."
@@ -25,7 +25,7 @@ require 'rake/loaders/makefile'
 import '.depend_erlang.mf'
 
 namespace :erlang do
-  
+
   def handle_test(mode, args)
     directories = ERL_DIRECTORIES + ERL_DIRECTORIES.pathmap("%{ebin,test}X")
     if args.name
@@ -46,7 +46,7 @@ namespace :erlang do
       end
     end
   end
-    
+
   def collect_boot_files(releases)
     releases.collect { |elt|
       if elt =~ /^release/
@@ -60,26 +60,26 @@ namespace :erlang do
       end
     }
   end
-  
+
   def collect_release_files(rel_sources)
     rel_sources.inject({}) do |acc,d|
       config_file = d.pathmap("%d/../vsn.config")
       vsn = extract_version_information(config_file,"release_name").gsub(/\"/,"")
       directory "release_local"
       map_expression = "%{src,ebin}X-" + vsn  + ".rel"
-      rel_file = d.ext("").pathmap(map_expression) 
+      rel_file = d.ext("").pathmap(map_expression)
       acc[rel_file] = d
       acc[rel_file.pathmap("release_local/%f")] = d
       acc
     end
   end
-  
+
   def collect_generated_archives(releases)
     tmp = releases.delete_if { |elt| elt =~ /^release_local/ }
     tmp = tmp.pathmap("releases/%f").ext(".tar.gz")
     tmp
   end
-  
+
   def extract_version_information(file, type)
     informations = []
     IO.foreach(file) { |line|
@@ -87,13 +87,13 @@ namespace :erlang do
     }
     informations[0]
   end
-  
+
   def application_modules(app_file)
     modules = FileList.new(app_file.pathmap("%d/*.beam")).pathmap("%f").ext("")
     modules = modules.map {|item| item.gsub(/^([A-Z].*)/, '\'\1\'')}
     modules = modules.join(', ')
   end
-  
+
   def check_dependencies (file)
     dependencies = []
     IO.foreach(file) { |line|
@@ -107,14 +107,14 @@ namespace :erlang do
                    end
                  end
                end
-      if header 
+      if header
         dependencies << "#{header}"
         dependencies <<  check_dependencies(header)
       end
     } if File.file?(file)
     dependencies.flatten
   end
-  
+
   def erlang_include_dependencies
     erlang_source_dependencies + erlang_test_dependencies
   end
@@ -143,7 +143,7 @@ namespace :erlang do
     end
     run_script("make_script",[style, source, output] + ERL_DIRECTORIES)
   end
-  
+
   ERL_SOURCES = FileList['lib/*/src/*.erl']
   ERL_BEAM = ERL_SOURCES.pathmap("%{src,ebin}X.beam")
 
@@ -174,7 +174,7 @@ namespace :erlang do
   directory "applications"
   CLEAN.include "release_local"
 
-  ERL_DIRECTORIES.each do |d| 
+  ERL_DIRECTORIES.each do |d|
     directory d
     CLEAN.include d
   end
@@ -182,51 +182,51 @@ namespace :erlang do
   CLEAN.include("lib/*/test/*.beam")
   CLEAN.include("lib/*/cover")
 
-  def beam_dependencies_with_emake(beam, file) 
+  def beam_dependencies_with_emake(beam, file)
     dependencies = check_dependencies(file).uniq
     dependencies.collect { |dependency|
       ["#{beam}: #{dependency}", "Emakefile: #{dependency}"]
     } + ["#{beam} : #{file}", "#{beam}: Emakefile"]
   end
 
-  def beam_dependencies(beam, file) 
+  def beam_dependencies(beam, file)
     dependencies = check_dependencies(file).uniq
     dependencies.collect { |dependency|
       ["#{beam}: #{dependency}"]
     } + ["#{beam} : #{file}"]
   end
 
-  if USE_EMAKE 
+  if USE_EMAKE
     def erlang_test_dependencies
       FileList['lib/*/test/*.erl'].collect { |file|
         beam = file.pathmap("%X.beam")
-        beam_dependencies_with_emake(beam, file) 
+        beam_dependencies_with_emake(beam, file)
       }.flatten
     end
-    
+
     def erlang_source_dependencies
       FileList['lib/*/src/*.erl'].collect { |file|
         beam = file.pathmap("%{src,ebin}X.beam")
         beam_dependencies_with_emake(beam, file)
      }.flatten
     end
-    
+
     file "Emakefile" => ERL_SOURCES + ERL_TESTS do |t|
       source_directories = t.prerequisites.collect { |elt| elt.pathmap("%d")}
       File.open("Emakefile",'w') do |file|
-        
+
         source_directories.uniq.each do |elt|
           target_directory = elt.pathmap("%{src,ebin}X")
           options = ["{outdir,\"#{target_directory}\"}",
                      "{i, \"lib\"}",
                      "{i,\"lib/*/include\"}"] + EMAKE_COMPILE_OPTIONS
-          option_string = "[#{options.join(',')}]" 
+          option_string = "[#{options.join(',')}]"
           file.write("{\"#{elt}/*\",#{option_string}}.\n")
         end
       end
     end
     CLEAN.include "Emakefile"
-    
+
     desc "Compile Erlang sources"
     task :modules => ERL_DIRECTORIES + ERL_BEAM + ERL_BEAM_TESTS do
       sh "#{ERL_TOP}/bin/erl -noinput -s make all -s erlang halt "
@@ -239,14 +239,14 @@ namespace :erlang do
         beam_dependencies(beam, file)
       }.flatten
     end
-    
+
     def erlang_source_dependencies
       FileList['lib/*/src/*.erl'].collect { |file|
         beam = file.pathmap("%{src,ebin}X.beam")
         beam_dependencies(beam, file)
       }.flatten
     end
-    
+
     rule ".beam" =>  ["%{ebin,src}X.erl"] do |t|
       output = t.name.pathmap("%d")
       sh "#{ERL_TOP}/bin/erlc -Ilib #{ERLC_FLAGS} -o #{output} #{t.source}"
@@ -273,7 +273,7 @@ namespace :erlang do
   def release_to_src(a)
     if a =~ /^release/
       [ERL_RELEASE_FILES_DEP[a], a.pathmap("%d") ]
-    else 
+    else
       [ERL_RELEASE_FILES_DEP[a], a.pathmap("%d") ]
     end
 

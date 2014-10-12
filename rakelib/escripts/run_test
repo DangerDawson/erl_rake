@@ -26,12 +26,12 @@ execution_fun("cover", Application, Type) ->
 	    ok = application:load(list_to_atom(Application)),
 	    cover(Fun, Options) end.
 
-        
+
 run_test(Application, "all_tests") ->
     eunit:test({application, list_to_atom(Application)},[]);
 run_test(_, File) ->
     eunit:test({file, File},[]).
-    
+
 usage() ->
     io:format("usage: run_test \"test\"|\"cover\" <application_name>  <\"all_tests\"|test_description_file> <application_path>\n"),
     halt(1).
@@ -58,9 +58,9 @@ report(Options) ->
 		{App, M, Analyse}
 	end,
     Results = [F(M) || M <- cover:modules()],
-    Coverage = cover_to_xml(Results), 
+    Coverage = cover_to_xml(Results),
     Export = xmerl:export_simple([{cover, Coverage}], xmerl_xml),
-    
+
     Output_directory = proplists: get_value(output_directory, Options, "."),
     Directory_name = filename:absname(Output_directory),
     ok = filelib:ensure_dir(Directory_name),
@@ -69,7 +69,7 @@ report(Options) ->
 
     Summary_file = filename:join(Output_directory, "cover_tool.xml"),
     file:write_file(Summary_file, Export),
-    
+
     HTML_file = fun(M) ->
 			filename:join(Directory_name, atom_to_list(M) ++".COVER.html")
 		end,

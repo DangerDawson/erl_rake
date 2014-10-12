@@ -7,7 +7,7 @@
 
 start(_Type, _StartArgs) ->
     case sample_rake_sup:start_link() of
-	{ok, Pid} -> 
+	{ok, Pid} ->
 	    {ok, Pid};
 	Error ->
 	    Error

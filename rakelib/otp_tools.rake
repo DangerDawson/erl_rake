@@ -3,7 +3,7 @@
 # Distributed under BSD licence
 namespace :otp do
 
-  
+
   directory "bin"
   directory "log"
   directory "pipes"
@@ -77,15 +77,15 @@ namespace :otp do
                                                 "bin/connect_local",
                                                 "bin/start_local",
                                                 "bin/start_erl_local"] do |t, args|
-    
-    opt = if args.daemon 
+
+    opt = if args.daemon
             "\"-daemon\""
           else
             "\" \""
           end
     rel = ERL_RELEASE_FILES.include("#{args.name}-*.rel").first
     puts rel
-    
+
     boot = rel.ext("").pathmap("release_local/%f")
     conf = rel.pathmap("%d/../release_config/sys")
     sh "bin/start_local #{boot} #{conf} #{opt} #{ERL_FLAGS}"
@@ -105,11 +105,11 @@ namespace :otp do
     mkdir root_directory + "/priv"
     mkdir root_directory + "/doc"
     mkdir root_directory + "/release_config"
-    File.open(root_directory + "/vsn.config", 'w') do |file| 
+    File.open(root_directory + "/vsn.config", 'w') do |file|
       file.write("{vsn,\"0.1\"}.\n")
       file.write("{release_name,\"initial\"}.\n")
     end
-  
+
     File.open(root_directory + "/src/" + app_file_name, 'w') do |file|
       lines = ["{application, " + app_name + ",\n",
                "[{description, \"\"},\n",
@@ -140,11 +140,11 @@ namespace :otp do
     end
 
     # Create some deafult startup scripts
-    File.open(root_directory + "/release_config/startup.conf", 'w') do |file| 
+    File.open(root_directory + "/release_config/startup.conf", 'w') do |file|
       file.write("ERL_FLAGS=\"-pa patches +K true -sname #{app_name} -smp auto\"\n")
       file.write("export ERL_FLAGS\n")
     end
-    File.open(root_directory + "/release_config/sys.config", 'w') do |file| 
+    File.open(root_directory + "/release_config/sys.config", 'w') do |file|
       file.write("[].")
     end
 
@@ -160,12 +160,12 @@ namespace :otp do
 
   CLEAN.include('tmp')
   CLEAN.include('targets')
-  
+
   desc "Build an initial empty target system"
   task :initial_target, :name, :version, :needs => ["erlang:releases"] do |t,args|
     release_name = FileList.new("lib/*/ebin/"+File.join(args.name+'-'+args.version+'.rel'))
     release_archive = File.join('tmp',args.name+'-'+args.version+'.tar.gz')
-    
+
     if release_name.empty? or !File.file?(release_name[0])
       puts "The release #{args.name}-#{args.version} doesn't exist"
       exit(-1)
@@ -175,7 +175,7 @@ namespace :otp do
     FileUtils.makedirs('targets')
     run_script("make_target", [release_name.ext(""),"tmp","targets",ERL_TOP] +
                ERL_DIRECTORIES)
-    
+
   FileUtils.rm_r('tmp')
   end
 end

@@ -10,7 +10,7 @@ main([Application| Paths]) ->
     end;
 main(_) ->
     usage().
-        
+
 usage() ->
     io:format("usage: make_doc <application_name> <application_path>\n"),
     halt(1).

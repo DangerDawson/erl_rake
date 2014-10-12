@@ -10,7 +10,7 @@
 -export([atoms/0]).
 -export([breaks_xref/0]).
 
-atoms() -> 
+atoms() ->
     lists:foldl(fun(X,Acc) -> [X|Acc] end,
 	       [],
 	       [foobar, bar, baz]).
